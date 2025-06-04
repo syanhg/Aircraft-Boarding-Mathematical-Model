@@ -1,0 +1,75 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+
+\definecolor{lowtime}{HTML}{FFFFB2}
+\definecolor{midtime}{HTML}{FD8D3C}
+\definecolor{hightime}{HTML}{BD0026}
+
+\begin{document}
+
+\begin{figure}[htbp]
+    \centering
+    \caption{Random Strategy: Boeing 737-800 Boarding Time Heatmap}
+    \label{fig:random_heatmap}
+    
+    \begin{tikzpicture}[scale=0.5]
+        % Draw aircraft outline
+        \draw[thick] (0,0) rectangle (7,20);
+        \draw[thick, dashed] (3.5,0) -- (3.5,20);
+        
+        % Draw row labels
+        \foreach \i in {1,...,19} {
+            \node[left] at (-0.5,20-\i+0.5) {\i};
+        }
+        
+        % Draw seat labels
+        \node at (0.5,-0.5) {A};
+        \node at (1.5,-0.5) {B};
+        \node at (2.5,-0.5) {C};
+        \node at (4.5,-0.5) {D};
+        \node at (5.5,-0.5) {E};
+        \node at (6.5,-0.5) {F};
+        
+        % Random strategy data (high variability)
+        \foreach \i in {1,...,19} {
+            \foreach \j in {0,...,5} {
+                % Random time between 15-22 minutes
+                \pgfmathsetmacro{\time}{15 + rnd*7}
+                \pgfmathsetmacro{\colorval}{min(1,max(0,(\time-15)/7))}
+                \pgfmathsetmacro{\red}{1*\colorval}
+                \pgfmathsetmacro{\green}{0.55*(1-\colorval)}
+                \pgfmathsetmacro{\blue}{0.15*(1-\colorval)}
+                \fill[color={\red,\green,\blue}] (\j,20-\i) rectangle (\j+1,20-\i+1);
+                \node[white] at (\j+0.5,20-\i+0.5) {\pgfmathprintnumber[precision=1]{\time}};
+            }
+        }
+        
+        % Draw legend
+        \begin{scope}[shift={(9,10)}]
+            \draw (0,0) rectangle (4,4);
+            \node[right] at (4.2,3.5) {Boarding Time (minutes)};
+            \foreach \i in {0,...,7} {
+                \pgfmathsetmacro{\ypos}{\i*4/7}
+                \pgfmathsetmacro{\time}{15 + \i}
+                \pgfmathsetmacro{\colorval}{min(1,max(0,(\time-15)/7))}
+                \pgfmathsetmacro{\red}{1*\colorval}
+                \pgfmathsetmacro{\green}{0.55*(1-\colorval)}
+                \pgfmathsetmacro{\blue}{0.15*(1-\colorval)}
+                \fill[color={\red,\green,\blue}] (0,\ypos) rectangle (1,\ypos+4/7);
+                \node[right] at (1.2,\ypos+2/7) {\pgfmathprintnumber[precision=0]{\time}};
+            }
+        \end{scope}
+        
+        % Note
+        \node[align=center] at (3.5,-2) {Random Strategy\\Avg. Time: 18.7 min};
+    \end{tikzpicture}
+\end{figure}
+
+\end{document}
