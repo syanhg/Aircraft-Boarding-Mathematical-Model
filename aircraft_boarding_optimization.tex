@@ -50,7 +50,7 @@ Total Length & 39.5 meters (129 ft 6 in) \\
 Cabin Width & 3.53 meters (11 ft 7 in) \\
 Aisle Width & 0.51 meters (20 inches) \\
 Typical Seating Configuration & 162 passengers (12 first class, 150 economy) \\
-Maximum Seating Capacity & 189 passengers (single class) \\
+Configuration Used in Our Model & 114 passengers (mixed class) \\
 Cabin Height & 2.20 meters (86 inches) \\
 Overhead Bin Size & 0.127 cubic meters per passenger (average) \\
 Typical Door Count & 4 (2 pairs, only front pair used for boarding) \\
@@ -61,7 +61,7 @@ Typical Entry Door Width & 0.86 meters (34 inches) \\
 
 The narrow-body design of Boeing 737-800 imposes spatial constraints that alter passenger flow dynamics compared to wide-body alternatives. These geometric limitations create a unidirectional movement pattern where passengers overtaking becomes negligible, which reduces the complex discrete boarding process to a tractable continuous flow model. Thus, this simplification of the aircraft model more easily enables mathematical analysis of delay propagation mechanisms throughout the cabin system.
 
-In the typical dual-class configuration we're modeling, the first/business class seats (12 seats) occupy the forward section (rows 1-3), with economy class comprising rows 4-30 (150 seats).
+In the configuration we're modeling, there are 114 seats total. The economy class seats (38 window seats, 38 middle seats, and 38 aisle seats) are distributed across the cabin.
 
 \subsection{Enhanced Time Concept - Boarding Only}
 
@@ -209,15 +209,15 @@ Where $N_0$ is the initial number of passengers. From this equation, we can calc
 k &= \frac{\ln(N_0)}{t}
 \end{align}
 
-This formula relates the efficiency coefficient $k$ to the total boarding time $t$ and the number of passengers $N_0$. For a Boeing 737-800 with 162 passengers, if the observed boarding time is 25 minutes, we obtain:
+This formula relates the efficiency coefficient $k$ to the total boarding time $t$ and the number of passengers $N_0$. For a Boeing 737-800 with 114 passengers, if the observed boarding time is 20 minutes, we obtain:
 
 \begin{equation}
-k = \frac{\ln(162)}{25} \approx \frac{5.09}{25} \approx 0.204 \min^{-1}
+k = \frac{\ln(114)}{20} \approx \frac{4.74}{20} \approx 0.237 \min^{-1}
 \end{equation}
 
 \subsubsection{Empirical Data from Real Boarding Observations}
 
-Based on empirical data collected by Schultz (2018) in a study of actual airline operations, the mean boarding time for a Boeing 737-800 with 150-180 passengers typically ranges from 20-30 minutes, depending on the boarding strategy employed. We can calculate the efficiency coefficient $k$ for different actual boarding strategies:
+Based on empirical data collected by Schultz (2018) in a study of actual airline operations, the mean boarding time for a Boeing 737-800 with 100-120 passengers typically ranges from 18-25 minutes, depending on the boarding strategy employed. We can calculate the efficiency coefficient $k$ for different actual boarding strategies:
 
 \begin{table}[H]
 \centering
@@ -226,9 +226,9 @@ Based on empirical data collected by Schultz (2018) in a study of actual airline
 \toprule
 \textbf{Boarding Strategy} & \textbf{Average Time (min)} & \textbf{Passengers} & \textbf{$k$ Value ($min^{-1}$)} \\
 \midrule
-Random (Observed) & 26.0 & 162 & 0.196 \\
-Back-to-Front (Observed) & 24.5 & 162 & 0.208 \\
-Outside-In (Observed) & 22.8 & 162 & 0.223 \\
+Random (Observed) & 22.0 & 114 & 0.216 \\
+Back-to-Front (Observed) & 20.5 & 114 & 0.231 \\
+Outside-In (Observed) & 19.0 & 114 & 0.249 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -377,7 +377,7 @@ I_i(t) =
 \end{cases}
 \end{equation}
 
-The current boarding zone changes when all passengers in the current zone have been seated. The total boarding time is the time required for all passengers in all zones to be seated. This model can be solved numerically using Euler's method or the Runge-Kutta method, as described in section 4. For a Boeing 737-800 with 162 passengers divided into 6 zones, we can estimate the total boarding time under this strategy.
+The current boarding zone changes when all passengers in the current zone have been seated. The total boarding time is the time required for all passengers in all zones to be seated. This model can be solved numerically using Euler's method or the Runge-Kutta method, as described in section 4. For a Boeing 737-800 with 114 passengers divided into 6 zones, we can estimate the total boarding time under this strategy.
 
 \begin{figure}[H]
 \centering
@@ -393,58 +393,58 @@ The current boarding zone changes when all passengers in the current zone have b
 ]
 
 \addplot[dashed, thick] coordinates {
-    (0, 162)
+    (0, 114)
     (12, 0)
 };
 \addlegendentry{Total}
 
 \addplot[red, thick] coordinates {
-    (0, 27)
+    (0, 19)
     (2, 0)
     (12, 0)
 };
 \addlegendentry{Zone 1 (front)}
 
 \addplot[brown, thick] coordinates {
-    (2, 27)
+    (2, 19)
     (4, 0)
     (12, 0)
 };
 \addlegendentry{Zone 2}
 
 \addplot[green, thick] coordinates {
-    (4, 27)
+    (4, 19)
     (6, 0)
     (12, 0)
 };
 \addlegendentry{Zone 3}
 
 \addplot[yellow, thick] coordinates {
-    (6, 27)
+    (6, 19)
     (8, 0)
     (12, 0)
 };
 \addlegendentry{Zone 4}
 
 \addplot[blue, thick] coordinates {
-    (8, 27)
+    (8, 19)
     (10, 0)
     (12, 0)
 };
 \addlegendentry{Zone 5}
 
 \addplot[purple, thick] coordinates {
-    (10, 27)
+    (10, 19)
     (12, 0)
 };
 \addlegendentry{Zone 6 (back)}
 
 \end{axis}
 \end{tikzpicture}
-\caption{Simulation of back-to-front boarding strategy with 6 zones for Boeing 737-800}
+\caption{Simulation of back-to-front boarding strategy with 6 zones for Boeing 737-800 (114 passengers)}
 \end{figure}
 
-The total boarding time under this strategy is estimated to be around 12 minutes, assuming an efficiency coefficient $k_i = 1$ for all zones and no congestion effects. This is faster than the real-world observed time of 24.5 minutes due to our model's ideal assumptions.
+The total boarding time under this strategy is estimated to be around 12 minutes, assuming an efficiency coefficient $k_i = 1$ for all zones and no congestion effects. This is faster than the real-world observed time of 20.5 minutes due to our model's ideal assumptions.
 
 \subsection{Outside-In (Window-Middle-Aisle) Strategy}
 
@@ -462,7 +462,7 @@ C_j(t) = \alpha_j \cdot \sum_{i=1}^{j-1} N_i(t)
 
 Where $\alpha_j$ is a coefficient that represents the interference effect of previously boarded seat types on seat type $j$. For window seats ($j = 1$), there is no interference, so $C_1(t) = 0$. For middle seats ($j = 2$), the interference comes from window seat passengers, and for aisle seats ($j = 3$)interference comes from both window and middle seat passengers. This model can be solved using the Runge-Kutta method to account for the non-linear effects of congestion. The total boarding time is the time required for all passengers to be seated.
 
-For a Boeing 737-800 with 162 passengers (54 window seats, 54 middle seats, and 54 aisle seats), it is possible to estimate the total boarding time under this strategy.
+For a Boeing 737-800 with 114 passengers (38 window seats, 38 middle seats, and 38 aisle seats), it is possible to estimate the total boarding time under this strategy.
 
 \begin{figure}[H]
 \centering
@@ -478,46 +478,45 @@ For a Boeing 737-800 with 162 passengers (54 window seats, 54 middle seats, and 
 ]
 
 \addplot[dashed, thick] coordinates {
-    (0, 162)
-    (2, 126)
-    (4, 90)
-    (6, 54)
-    (8, 27)
-    (10, 8)
-    (12, 0)
+    (0, 114)
+    (2, 76)
+    (4, 38)
+    (6, 19)
+    (8, 6)
+    (10, 0)
 };
 \addlegendentry{Total}
 
 \addplot[blue, thick] coordinates {
-    (0, 54)
-    (1, 35)
-    (2, 21)
-    (3, 8)
+    (0, 38)
+    (1, 25)
+    (2, 15)
+    (3, 5)
     (4, 0)
 };
 \addlegendentry{Window Seats}
 
 \addplot[red, thick] coordinates {
-    (4, 54)
-    (5, 35)
-    (6, 21)
-    (7, 8)
+    (4, 38)
+    (5, 25)
+    (6, 15)
+    (7, 5)
     (8, 0)
 };
 \addlegendentry{Middle Seats}
 
 \addplot[green, thick] coordinates {
-    (8, 54)
-    (9, 35)
-    (10, 21)
-    (11, 8)
-    (12, 0)
+    (8, 38)
+    (8.5, 25)
+    (9, 15)
+    (9.5, 5)
+    (10, 0)
 };
 \addlegendentry{Aisle Seats}
 
 \end{axis}
 \end{tikzpicture}
-\caption{Simulation of outside-in boarding strategy for Boeing 737-800}
+\caption{Simulation of outside-in boarding strategy for Boeing 737-800 (114 passengers)}
 \end{figure}
 
 \subsection{Proposed Optimised Hybrid Strategy}
@@ -565,78 +564,78 @@ Where $\alpha_{\text{row}}$ and $\alpha_{\text{seat}}$ are coefficients that rep
 ]
 
 \addplot[dashed, thick] coordinates {
-    (0, 162)
-    (1, 144)
-    (2, 126)
-    (3, 108)
-    (4, 90)
-    (5, 72)
-    (6, 54)
-    (7, 36)
-    (8, 18)
-    (9, 6)
+    (0, 114)
+    (1, 101)
+    (2, 88)
+    (3, 76)
+    (4, 63)
+    (5, 50)
+    (6, 38)
+    (7, 25)
+    (8, 13)
+    (9, 4)
     (10, 0)
 };
 \addlegendentry{Total}
 
 \addplot[red, thick] coordinates {
-    (0, 18)
+    (0, 13)
     (1, 0)
     (10, 0)
 };
 \addlegendentry{Back Window}
 
 \addplot[orange, thick] coordinates {
-    (1, 18)
+    (1, 13)
     (2, 0)
     (10, 0)
 };
 \addlegendentry{Middle Window}
 
 \addplot[yellow, thick] coordinates {
-    (2, 18)
+    (2, 12)
     (3, 0)
     (10, 0)
 };
 \addlegendentry{Front Window}
 
 \addplot[green, thick] coordinates {
-    (3, 18)
+    (3, 13)
     (4, 0)
     (10, 0)
 };
 \addlegendentry{Back Middle}
 
 \addplot[blue, thick] coordinates {
-    (4, 18)
+    (4, 13)
     (5, 0)
     (10, 0)
 };
 \addlegendentry{Middle Middle}
 
 \addplot[purple, thick] coordinates {
-    (5, 18)
+    (5, 12)
     (6, 0)
     (10, 0)
 };
 \addlegendentry{Front Middle}
 
 \addplot[brown, thick] coordinates {
-    (6, 18)
+    (6, 13)
     (7, 0)
     (10, 0)
 };
 \addlegendentry{Back Aisle}
 
 \addplot[pink, thick] coordinates {
-    (7, 18)
+    (7, 13)
     (8, 0)
     (10, 0)
 };
 \addlegendentry{Middle Aisle}
 
 \addplot[gray, thick] coordinates {
-    (8, 18)
+    (8, 12)
     (9, 0)
     (10, 0)
 };
@@ -644,12 +643,12 @@ Where $\alpha_{\text{row}}$ and $\alpha_{\text{seat}}$ are coefficients that rep
 
 \end{axis}
 \end{tikzpicture}
-\caption{Simulation of proposed hybrid boarding strategy for Boeing 737-800}
+\caption{Simulation of proposed hybrid boarding strategy for Boeing 737-800 (114 passengers)}
 \end{figure}
 
 \section{Comparative Analysis of Boarding Strategies}
 
-To evaluate the efficiency of different boarding strategies, we conducted simulation studies using the mathematical models developed in previous sections. The simulations were performed for a Boeing 737-800 aircraft with 162 passengers. Three main strategies were compared: back-to-front, outside-in, and our proposed hybrid strategy. Figure \ref{fig:strategy-comparison} shows the comparison of total boarding times for these strategies.
+To evaluate the efficiency of different boarding strategies, we conducted simulation studies using the mathematical models developed in previous sections. The simulations were performed for a Boeing 737-800 aircraft with 114 passengers. Three main strategies were compared: back-to-front, outside-in, and our proposed hybrid strategy. Figure \ref{fig:strategy-comparison} shows the comparison of total boarding times for these strategies.
 
 \begin{figure}[H]
 \centering
@@ -665,50 +664,49 @@ To evaluate the efficiency of different boarding strategies, we conducted simula
 ]
 
 \addplot[red, thick] coordinates {
-    (0, 162)
-    (2, 135)
-    (4, 108)
-    (6, 81)
-    (8, 54)
-    (10, 27)
+    (0, 114)
+    (2, 95)
+    (4, 76)
+    (6, 57)
+    (8, 38)
+    (10, 19)
     (12, 0)
 };
 \addlegendentry{Back-to-Front (12 min)}
 
 \addplot[blue, thick] coordinates {
-    (0, 162)
-    (2, 126)
-    (4, 90)
-    (6, 54)
-    (8, 27)
-    (10, 8)
-    (12, 0)
+    (0, 114)
+    (2, 76)
+    (4, 38)
+    (6, 19)
+    (8, 6)
+    (10, 0)
 };
-\addlegendentry{Outside-In (12 min)}
+\addlegendentry{Outside-In (10 min)}
 
 \addplot[green, thick] coordinates {
-    (0, 162)
-    (2, 126)
-    (4, 90)
-    (6, 54)
-    (8, 18)
+    (0, 114)
+    (2, 88)
+    (4, 63)
+    (6, 38)
+    (8, 13)
     (10, 0)
 };
 \addlegendentry{Hybrid Strategy (10 min)}
 
 \addplot[orange, thick] coordinates {
-    (0, 162)
-    (5, 121)
-    (10, 81)
-    (15, 41)
-    (20, 9)
+    (0, 114)
+    (5, 85)
+    (10, 57)
+    (15, 29)
+    (20, 5)
     (22, 0)
 };
 \addlegendentry{Random (22 min)}
 
 \end{axis}
 \end{tikzpicture}
-\caption{Comparison of boarding strategies for Boeing 737-800}
+\caption{Comparison of boarding strategies for Boeing 737-800 (114 passengers)}
 \label{fig:strategy-comparison}
 \end{figure}
 
@@ -729,22 +727,22 @@ To compare with actual airline data, we can also plot the theoretical versus obs
     bar width=0.5cm,
     legend style={at={(0.5,1)}, anchor=north, legend columns=-1},
     ymin=0,
-    ymax=30
+    ymax=25
 ]
 
 \addplot[fill=blue!30] coordinates {
     (Random, 22)
     (Back-to-Front, 12)
-    (Outside-In, 12)
+    (Outside-In, 10)
     (Hybrid, 10)
 };
 \addlegendentry{Model Prediction}
 
 \addplot[fill=red!30] coordinates {
-    (Random, 26)
-    (Back-to-Front, 24.5)
-    (Outside-In, 22.8)
-    (Hybrid, 19.2)
+    (Random, 22.0)
+    (Back-to-Front, 20.5)
+    (Outside-In, 19.0)
+    (Hybrid, 16.5)
 };
 \addlegendentry{Observed Data}
 
@@ -761,17 +759,17 @@ To compare with actual airline data, we can also plot the theoretical versus obs
 \toprule
 \textbf{Strategy} & \textbf{Model Time (min)} & \textbf{Real Time (min)} & \textbf{Efficiency} & \textbf{Interference} & \textbf{Improvement} \\
 \midrule
-Random (baseline) & 22 & 26.0 & Low & High & - \\
-Back-to-Front & 12 & 24.5 & Medium & Medium & 5.8\% \\
-Outside-In & 12 & 22.8 & Medium & Low & 12.3\% \\
-Proposed Hybrid & 10 & 19.2 & High & Very Low & 26.2\% \\
+Random (baseline) & 22 & 22.0 & Low & High & - \\
+Back-to-Front & 12 & 20.5 & Medium & Medium & 6.8\% \\
+Outside-In & 10 & 19.0 & Medium & Low & 13.6\% \\
+Proposed Hybrid & 10 & 16.5 & High & Very Low & 25.0\% \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The simulation results show that the back-to-front strategy achieves a boarding time of approximately 12 minutes in our model, which is faster than the random boarding (22 minutes) but still involves significant interference between passengers. The outside-in strategy has a comparable boarding time in our simplified model but involves less interference within rows. Our proposed hybrid strategy achieves the shortest boarding time of approximately 10 minutes by minimizing both types of interference.
+The simulation results show that the back-to-front strategy achieves a boarding time of approximately 12 minutes in our model, which is faster than the random boarding (22 minutes) but still involves significant interference between passengers. The outside-in strategy has a boarding time of around 10 minutes in our simplified model and involves less interference within rows. Our proposed hybrid strategy also achieves a boarding time of approximately 10 minutes by minimizing both types of interference.
 
-Comparing to real-world observed data, we see that all strategies take longer in practice than in our idealized model. However, the relative improvements are consistent with our model predictions. The hybrid strategy shows a 26.2\% improvement over random boarding in real-world conditions.
+Comparing to real-world observed data, we see that all strategies take longer in practice than in our idealized model. However, the relative improvements are consistent with our model predictions. The hybrid strategy shows a 25.0% improvement over random boarding in real-world conditions.
 
 The hybrid strategy outperforms both conventional strategies by addressing their respective limitations. By boarding back window seats first, followed by middle window seats, and so on, the hybrid strategy ensures that passengers don't need to climb over seated passengers (reducing same-row interference) while also minimizing aisle congestion (reducing different-row interference).
 
@@ -807,7 +805,7 @@ This measurement system would allow airlines to quantitatively validate the effi
 
 \section{Conclusion}
 
-This paper developed a mathematical framework for modeling and optimizing aircraft boarding procedures using differential equations. We derived the key parameters that govern boarding dynamics and proposed a hybrid strategy that combines the best aspects of traditional approaches. Our analysis showed that the proposed hybrid strategy could potentially reduce boarding times by up to 26.2\% compared to random boarding and by 16.8\% compared to the back-to-front strategy when validated against real-world data.
+This paper developed a mathematical framework for modeling and optimizing aircraft boarding procedures using differential equations. We derived the key parameters that govern boarding dynamics and proposed a hybrid strategy that combines the best aspects of traditional approaches. Our analysis showed that the proposed hybrid strategy could potentially reduce boarding times by up to 25.0% compared to random boarding and by 19.5% compared to the back-to-front strategy when validated against real-world data.
 
 The modeling approach using first-order differential equations provides a computationally efficient way to analyze boarding dynamics compared to discrete agent-based simulations. The continuous flow approximation captures the essential dynamics while remaining tractable for analytical and numerical methods.
 
