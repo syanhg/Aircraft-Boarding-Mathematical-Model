@@ -1,0 +1,356 @@
+\documentclass[landscape]{article}
+\usepackage[landscape,margin=0.7in]{geometry}
+\usepackage{pgfplots}
+\usepackage{tikz}
+\pgfplotsset{compat=1.18}
+
+\begin{document}
+\pagestyle{empty}
+
+\begin{figure}
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            title={\Large Random Boarding Strategy - t = 5 minutes (25\% Complete)},
+            xlabel={Seat Column},
+            ylabel={Row Number},
+            xticklabels={A,B,C,D,E,F},
+            ytick={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19},
+            xtick={0,1,2,3,4,5},
+            xmin=-0.5,
+            xmax=5.5,
+            ymin=0.5,
+            ymax=19.5,
+            y dir=reverse,
+            enlargelimits=false,
+            axis on top,
+            width=0.9\textwidth,
+            height=0.4\textheight,
+            colorbar,
+            colormap={boarding}{
+                color(0)=(white);
+                color(0.5)=(yellow);
+                color(1)=(purple)
+            },
+            colorbar style={
+                title={Status},
+                ytick={0,0.5,1},
+                yticklabels={Empty,Boarding,Seated},
+            },
+            point meta min=0,
+            point meta max=1
+        ]
+            
+        % Initialize with random boarding pattern (25% complete)
+        \addplot[matrix plot, mesh/cols=6, point meta=explicit] table [meta=C] {
+            x y C
+            0 1 0
+            1 1 0
+            2 1 1
+            3 1 0
+            4 1 1
+            5 1 0
+            0 2 1
+            1 2 0
+            2 2 0
+            3 2 0
+            4 2 0.5
+            5 2 0
+            0 3 0
+            1 3 1
+            2 3 0
+            3 3 0.5
+            4 3 0
+            5 3 0
+            0 4 0
+            1 4 0
+            2 4 0
+            3 4 0
+            4 4 0
+            5 4 1
+            0 5 0.5
+            1 5 0
+            2 5 1
+            3 5 0
+            4 5 0
+            5 5 0
+            0 6 0
+            1 6 0
+            2 6 0
+            3 6 1
+            4 6 0
+            5 6 0
+            0 7 0
+            1 7 0
+            2 7 0
+            3 7 0
+            4 7 0
+            5 7 0
+            0 8 1
+            1 8 0
+            2 8 0
+            3 8 0
+            4 8 0
+            5 8 0
+            0 9 0
+            1 9 0
+            2 9 1
+            3 9 0
+            4 9 0
+            5 9 0
+            0 10 0
+            1 10 0
+            2 10 0
+            3 10 0
+            4 10 0
+            5 10 0
+            0 11 0
+            1 11 0
+            2 11 0
+            3 11 0
+            4 11 1
+            5 11 0
+            0 12 0
+            1 12 0
+            2 12 0
+            3 12 0
+            4 12 0
+            5 12 0
+            0 13 1
+            1 13 0
+            2 13 0
+            3 13 0
+            4 13 0
+            5 13 0
+            0 14 0
+            1 14 0
+            2 14 0
+            3 14 0
+            4 14 0
+            5 14 0
+            0 15 0
+            1 15 1
+            2 15 0
+            3 15 0
+            4 15 0
+            5 15 0
+            0 16 0
+            1 16 0
+            2 16 0.5
+            3 16 0
+            4 16 0
+            5 16 0
+            0 17 0
+            1 17 0
+            2 17 0
+            3 17 0
+            4 17 0
+            5 17 1
+            0 18 0
+            1 18 0
+            2 18 0
+            3 18 1
+            4 18 0
+            5 18 0
+            0 19 0
+            1 19 0
+            2 19 0
+            3 19 0
+            4 19 0
+            5 19 0
+        };
+        
+        % Draw aisle line
+        \draw[black, thick, dashed] (axis cs:2.5,0.5) -- (axis cs:2.5,19.5);
+        
+        % Time indicator
+        \node[font=\Large] at (axis cs:2.5,20.5) {t = 5 minutes (approx. 25\% complete)};
+        
+        % Description
+        \node[draw, align=left, anchor=south west] at (axis cs:-0.5,-2) {
+            \textbf{Random Boarding Strategy:}\\
+            • No predetermined boarding order\\
+            • Passengers board in completely random sequence\\
+            • No zone-based or seat-based prioritization\\
+            • High potential for congestion and interference\\
+            • Noticeable random distribution of seated passengers across the cabin\\
+            • Estimated total boarding time: 18.7 minutes
+        };
+        \end{axis}
+    \end{tikzpicture}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            title={\Large Random Boarding Strategy - t = 10 minutes (50\% Complete)},
+            xlabel={Seat Column},
+            ylabel={Row Number},
+            xticklabels={A,B,C,D,E,F},
+            ytick={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19},
+            xtick={0,1,2,3,4,5},
+            xmin=-0.5,
+            xmax=5.5,
+            ymin=0.5,
+            ymax=19.5,
+            y dir=reverse,
+            enlargelimits=false,
+            axis on top,
+            width=0.9\textwidth,
+            height=0.4\textheight,
+            colorbar,
+            colormap={boarding}{
+                color(0)=(white);
+                color(0.5)=(yellow);
+                color(1)=(purple)
+            },
+            colorbar style={
+                title={Status},
+                ytick={0,0.5,1},
+                yticklabels={Empty,Boarding,Seated},
+            },
+            point meta min=0,
+            point meta max=1
+        ]
+            
+        % Initialize with random boarding pattern (50% complete)
+        \addplot[matrix plot, mesh/cols=6, point meta=explicit] table [meta=C] {
+            x y C
+            0 1 1
+            1 1 0
+            2 1 1
+            3 1 1
+            4 1 1
+            5 1 0
+            0 2 1
+            1 2 1
+            2 2 0
+            3 2 0
+            4 2 1
+            5 2 0
+            0 3 0
+            1 3 1
+            2 3 0
+            3 3 1
+            4 3 0
+            5 3 0
+            0 4 0
+            1 4 0
+            2 4 1
+            3 4 0
+            4 4 0
+            5 4 1
+            0 5 1
+            1 5 0
+            2 5 1
+            3 5 0
+            4 5 0
+            5 5 1
+            0 6 0
+            1 6 0
+            2 6 0
+            3 6 1
+            4 6 0
+            5 6 0.5
+            0 7 0.5
+            1 7 0
+            2 7 0
+            3 7 1
+            4 7 0
+            5 7 0
+            0 8 1
+            1 8 0
+            2 8 0
+            3 8 0
+            4 8 1
+            5 8 0
+            0 9 0
+            1 9 1
+            2 9 1
+            3 9 0
+            4 9 0
+            5 9 0
+            0 10 0
+            1 10 0
+            2 10 0
+            3 10 0
+            4 10 1
+            5 10 0
+            0 11 0
+            1 11 0
+            2 11 0
+            3 11 0
+            4 11 1
+            5 11 0
+            0 12 0
+            1 12 0.5
+            2 12 0
+            3 12 0
+            4 12 0
+            5 12 1
+            0 13 1
+            1 13 0
+            2 13 0
+            3 13 0
+            4 13 0
+            5 13 0
+            0 14 0
+            1 14 0
+            2 14 1
+            3 14 0
+            4 14 0
+            5 14 0
+            0 15 0
+            1 15 1
+            2 15 0
+            3 15 0
+            4 15 0
+            5 15 0
+            0 16 0
+            1 16 0
+            2 16 1
+            3 16 0
+            4 16 0
+            5 16 0
+            0 17 0
+            1 17 0
+            2 17 0
+            3 17 0
+            4 17 1
+            5 17 1
+            0 18 0
+            1 18 0
+            2 18 0
+            3 18 1
+            4 18 0
+            5 18 0
+            0 19 1
+            1 19 0
+            2 19 0
+            3 19 0
+            4 19 0
+            5 19 0
+        };
+        
+        % Draw aisle line
+        \draw[black, thick, dashed] (axis cs:2.5,0.5) -- (axis cs:2.5,19.5);
+        
+        % Time indicator
+        \node[font=\Large] at (axis cs:2.5,20.5) {t = 10 minutes (approx. 50\% complete)};
+        
+        % Description
+        \node[draw, align=left, anchor=south west] at (axis cs:-0.5,-2) {
+            \textbf{Random Boarding Strategy:}\\
+            • No predetermined boarding order\\
+            • Passengers board in completely random sequence\\
+            • No zone-based or seat-based prioritization\\
+            • High potential for congestion and interference\\
+            • Noticeable random distribution of seated passengers across the cabin\\
+            • Estimated total boarding time: 18.7 minutes
+        };
+        \end{axis}
+    \end{tikzpicture}
+\end{figure}
+
+\end{document}
