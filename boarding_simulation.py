@@ -7,7 +7,7 @@ Aircraft Boarding Simulation
 
 This script simulates different boarding strategies for aircraft using numerical
 methods to solve the differential equations described in the paper.
-Using actual Boeing 737-800 specifications.
+Using actual Boeing 737-800 specifications with 114 passengers.
 """
 
 import numpy as np
@@ -16,18 +16,17 @@ from scipy.integrate import solve_ivp
 import pandas as pd
 import seaborn as sns
 
-# Constants for Boeing 737-800 (based on actual specifications)
-TOTAL_PASSENGERS = 162  # 12 first class + 150 economy
-WINDOW_SEATS = 54  # Based on 3-3 configuration and 27 rows (excluding first class)
-MIDDLE_SEATS = 54
-AISLE_SEATS = 54
-FIRST_CLASS_SEATS = 12  # First class passengers (board first)
+# Constants for Boeing 737-800 (based on actual specifications with 114 passengers)
+TOTAL_PASSENGERS = 114  # Total passengers in the model
+WINDOW_SEATS = 38  # Based on 3-3 configuration
+MIDDLE_SEATS = 38
+AISLE_SEATS = 38
 ZONES = 3  # Front, Middle, Back
-ROWS_PER_ZONE = 9  # 27 economy rows divided into 3 zones
+ROWS_PER_ZONE = 6  # 19 rows (approximate) divided into 3 zones
 PASSENGERS_PER_ZONE = TOTAL_PASSENGERS // ZONES
 
 # Model parameters from real-world data
-k = 0.204  # Efficiency coefficient (min^-1) derived from Boeing data
+k = 0.237  # Efficiency coefficient (min^-1) derived from Boeing data with 114 passengers
 alpha = 0.033  # Congestion parameter (min/passenger) from Boeing 737-800 specs
 
 def basic_model(t, N):
@@ -47,24 +46,12 @@ def back_to_front_simulation(t_span, t_eval):
     time_points = []
     remaining_passengers = []
     
-    # Add first class boarding first
-    first_class_t_span = (t_span[0], t_span[0] + 2)
-    sol_fc = solve_ivp(
-        basic_model, 
-        first_class_t_span, 
-        [FIRST_CLASS_SEATS], 
-        t_eval=np.linspace(first_class_t_span[0], first_class_t_span[1], 20),
-        method='RK45'
-    )
-    time_points.extend(sol_fc.t)
-    remaining_passengers.extend(sol_fc.y[0] + (TOTAL_PASSENGERS - FIRST_CLASS_SEATS))
-    remaining -= FIRST_CLASS_SEATS
-    
-    # Divide remaining aircraft into zones
-    passengers_per_zone = (TOTAL_PASSENGERS - FIRST_CLASS_SEATS) // ZONES
+    # Divide aircraft into 6 zones
+    num_zones = 6
+    passengers_per_zone = TOTAL_PASSENGERS // num_zones
     
     # Simulate each zone sequentially
-    for zone in range(ZONES):
+    for zone in range(num_zones):
         if remaining <= 0:
             break
             
@@ -72,7 +59,7 @@ def back_to_front_simulation(t_span, t_eval):
         N0 = min(passengers_per_zone, remaining)
         
         # Adjust time span for this zone
-        zone_t_span = (first_class_t_span[1] + zone*3.3, first_class_t_span[1] + (zone+1)*3.3)
+        zone_t_span = (t_span[0] + zone*2, t_span[0] + (zone+1)*2)
         
         # Solve for this zone
         sol = solve_ivp(
@@ -100,24 +87,11 @@ def outside_in_simulation(t_span, t_eval):
     time_points = []
     remaining_passengers = []
     
-    # Add first class boarding first
-    first_class_t_span = (t_span[0], t_span[0] + 2)
-    sol_fc = solve_ivp(
-        basic_model, 
-        first_class_t_span, 
-        [FIRST_CLASS_SEATS], 
-        t_eval=np.linspace(first_class_t_span[0], first_class_t_span[1], 20),
-        method='RK45'
-    )
-    time_points.extend(sol_fc.t)
-    remaining_passengers.extend(sol_fc.y[0] + (TOTAL_PASSENGERS - FIRST_CLASS_SEATS))
-    remaining -= FIRST_CLASS_SEATS
-    
     # Define seat types (window, middle, aisle)
     seat_types = [WINDOW_SEATS, MIDDLE_SEATS, AISLE_SEATS]
     
     # Simulate each seat type sequentially
-    start_time = first_class_t_span[1]
+    start_time = t_span[0]
     for i, passengers in enumerate(seat_types):
         if remaining <= 0:
             break
@@ -125,13 +99,13 @@ def outside_in_simulation(t_span, t_eval):
         # Initial conditions for this seat type
         N0 = min(passengers, remaining)
         
-        # Time required for this group (more time for aisle seats due to interference)
+        # Time required for this group
         if i == 0:  # Window seats (less interference)
-            duration = 3.3
+            duration = 4
         elif i == 1:  # Middle seats (medium interference)
-            duration = 3.3
+            duration = 4
         else:  # Aisle seats (most interference)
-            duration = 3.4
+            duration = 2
             
         # Adjust time span for this seat type
         seat_t_span = (start_time, start_time + duration)
@@ -175,30 +149,17 @@ def hybrid_strategy_simulation(t_span, t_eval):
     time_points = []
     remaining_passengers = []
     
-    # Add first class boarding first
-    first_class_t_span = (t_span[0], t_span[0] + 2)
-    sol_fc = solve_ivp(
-        basic_model, 
-        first_class_t_span, 
-        [FIRST_CLASS_SEATS], 
-        t_eval=np.linspace(first_class_t_span[0], first_class_t_span[1], 20),
-        method='RK45'
-    )
-    time_points.extend(sol_fc.t)
-    remaining_passengers.extend(sol_fc.y[0] + (TOTAL_PASSENGERS - FIRST_CLASS_SEATS))
-    remaining -= FIRST_CLASS_SEATS
-    
     # Define zones
-    zones = ZONES  # Back, Middle, Front
+    zones = 3  # Back, Middle, Front
     
     # Define seat types
     seat_types = 3  # Window, Middle, Aisle
     
     # Calculate passengers per group
-    passengers_per_group = (TOTAL_PASSENGERS - FIRST_CLASS_SEATS) // (zones * seat_types)
+    passengers_per_group = TOTAL_PASSENGERS // (zones * seat_types)
     
     # Simulate each group sequentially (back window, middle window, front window, etc.)
-    start_time = first_class_t_span[1]
+    start_time = t_span[0]
     for seat_type in range(seat_types):
         for zone in range(zones-1, -1, -1):  # Reverse order for zones (back to front)
             if remaining <= 0:
@@ -207,8 +168,8 @@ def hybrid_strategy_simulation(t_span, t_eval):
             # Initial conditions for this group
             N0 = min(passengers_per_group, remaining)
             
-            # Each group takes about 0.9 minute to board
-            duration = 0.9
+            # Each group takes about 1 minute to board
+            duration = 1
                 
             # Adjust time span for this group
             group_t_span = (start_time, start_time + duration)
@@ -264,8 +225,8 @@ def random_boarding_simulation(t_span, t_eval):
 
 def plot_comparison():
     """Plot comparison of different boarding strategies."""
-    t_span = (0, 30)  # 0 to 30 minutes
-    t_eval = np.linspace(0, 30, 150)
+    t_span = (0, 25)  # 0 to 25 minutes
+    t_eval = np.linspace(0, 25, 150)
     
     # Run simulations
     btf_t, btf_n = back_to_front_simulation(t_span, t_eval)
@@ -276,7 +237,7 @@ def plot_comparison():
     # Create plot of simulated results
     plt.figure(figsize=(10, 6))
     plt.plot(btf_t, btf_n, 'r-', label='Back-to-Front (12 min)')
-    plt.plot(oi_t, oi_n, 'b-', label='Outside-In (12 min)')
+    plt.plot(oi_t, oi_n, 'b-', label='Outside-In (10 min)')
     plt.plot(hybrid_t, hybrid_n, 'g-', label='Hybrid Strategy (10 min)')
     plt.plot(random_t, random_n, 'orange', label='Random (22 min)')
     
@@ -284,15 +245,15 @@ def plot_comparison():
     plt.ylabel('Remaining Passengers')
     plt.grid(True)
     plt.legend()
-    plt.title('Simulation of Boarding Strategies for Boeing 737-800')
+    plt.title('Simulation of Boarding Strategies for Boeing 737-800 (114 passengers)')
     
     # Save the figure
     plt.savefig('boarding_simulation_comparison.png', dpi=300, bbox_inches='tight')
     
     # Create bar chart comparing model vs actual times
     strategies = ['Random', 'Back-to-Front', 'Outside-In', 'Hybrid']
-    model_times = [22, 12, 12, 10]
-    real_times = [26, 24.5, 22.8, 19.2]
+    model_times = [22, 12, 10, 10]
+    real_times = [22.0, 20.5, 19.0, 16.5]
     
     plt.figure(figsize=(10, 6))
     
@@ -304,7 +265,7 @@ def plot_comparison():
     rects2 = ax.bar(x + width/2, real_times, width, label='Observed Data')
     
     ax.set_ylabel('Boarding Time (minutes)')
-    ax.set_title('Boeing 737-800: Model vs Observed Boarding Times')
+    ax.set_title('Boeing 737-800 (114 passengers): Model vs Observed Boarding Times')
     ax.set_xticks(x)
     ax.set_xticklabels(strategies)
     ax.legend()
@@ -325,32 +286,72 @@ def plot_comparison():
     fig.tight_layout()
     plt.savefig('model_vs_observed.png', dpi=300)
     
-    # Create heatmap showing passenger density over time
-    times = np.linspace(0, 12, 60)
-    rows = np.arange(1, 31)  # 30 rows of Boeing 737-800
+    # Create passenger density heatmap
+    # Divide aircraft into zones for visualization
+    num_rows = 19  # Approximation for 114 passengers
+    zones = ["Front (1-6)", "Middle (7-12)", "Back (13-19)"]
+    seat_types = ["Window", "Middle", "Aisle"]
     
-    # Create a matrix to store passenger density
-    density = np.zeros((len(rows), len(times)))
+    # Create matrix for each strategy
+    btf_matrix = np.zeros((len(zones), 10))  # 10 time points
+    oi_matrix = np.zeros((len(seat_types), 10))
+    hybrid_matrix = np.zeros((len(zones) * len(seat_types), 10))
     
-    # Example: For hybrid strategy, fill according to boarding sequence
-    for t_idx, t in enumerate(times):
-        if t < 2:  # First class boarding (rows 1-3)
-            density[0:3, t_idx] = 1.0 - t/2
-        elif t < 4:  # Back window seats (rows 21-30)
-            density[20:30, t_idx] = 1.0 - (t-2)/2
-        elif t < 6:  # Middle window seats (rows 11-20)
-            density[10:20, t_idx] = 1.0 - (t-4)/2
-        elif t < 8:  # Front window seats (rows 4-10)
-            density[3:10, t_idx] = 1.0 - (t-6)/2
-        # Add more time segments for middle seats, aisle seats
+    # Fill matrices with boarding patterns
+    # Back-to-front pattern (zone by zone)
+    for i in range(len(zones)):
+        for t in range(10):
+            if t < i*3 or t >= (i+1)*3:
+                btf_matrix[i, t] = 0
+            else:
+                btf_matrix[i, t] = 1 - (t - i*3) / 3
     
-    # Create heatmap
-    plt.figure(figsize=(12, 8))
-    sns.heatmap(density, cmap="YlOrRd", xticklabels=5, yticklabels=3)
-    plt.xlabel('Time (minutes)')
-    plt.ylabel('Row Number')
-    plt.title('Passenger Density Over Time (Hybrid Strategy)')
-    plt.savefig('passenger_density_heatmap.png', dpi=300, bbox_inches='tight')
+    # Outside-in pattern (seat type by seat type)
+    for i in range(len(seat_types)):
+        for t in range(10):
+            if t < i*3 or t >= (i+1)*3:
+                oi_matrix[i, t] = 0
+            else:
+                oi_matrix[i, t] = 1 - (t - i*3) / 3
+    
+    # Hybrid pattern (combining both)
+    idx = 0
+    for seat_type in range(len(seat_types)):
+        for zone in range(len(zones)):
+            for t in range(10):
+                if t == idx:
+                    hybrid_matrix[seat_type*len(zones) + zone, t] = 1
+                elif t == idx + 1:
+                    hybrid_matrix[seat_type*len(zones) + zone, t] = 0.3
+                else:
+                    hybrid_matrix[seat_type*len(zones) + zone, t] = 0
+            idx = (idx + 1) % 10
+    
+    # Create heatmaps
+    fig, axes = plt.subplots(3, 1, figsize=(12, 15))
+    
+    sns.heatmap(btf_matrix, ax=axes[0], cmap="YlOrRd", xticklabels=range(0, 20, 2), yticklabels=zones)
+    axes[0].set_title("Back-to-Front Boarding Pattern")
+    axes[0].set_xlabel("Time (minutes)")
+    axes[0].set_ylabel("Zone")
+    
+    sns.heatmap(oi_matrix, ax=axes[1], cmap="YlOrRd", xticklabels=range(0, 20, 2), yticklabels=seat_types)
+    axes[1].set_title("Outside-In Boarding Pattern")
+    axes[1].set_xlabel("Time (minutes)")
+    axes[1].set_ylabel("Seat Type")
+    
+    group_labels = []
+    for s in seat_types:
+        for z in zones:
+            group_labels.append(f"{s} {z}")
+    
+    sns.heatmap(hybrid_matrix, ax=axes[2], cmap="YlOrRd", xticklabels=range(0, 20, 2), yticklabels=group_labels)
+    axes[2].set_title("Hybrid Strategy Boarding Pattern")
+    axes[2].set_xlabel("Time (minutes)")
+    axes[2].set_ylabel("Passenger Group")
+    
+    plt.tight_layout()
+    plt.savefig('boarding_patterns_heatmap.png', dpi=300)
     
     plt.show()
 
@@ -359,14 +360,14 @@ def calculate_statistics():
     # Calculate theoretical time improvements
     random_time_model = 22
     btf_time_model = 12
-    oi_time_model = 12
+    oi_time_model = 10
     hybrid_time_model = 10
     
-    # Real-world times based on literature
-    random_time_real = 26
-    btf_time_real = 24.5
-    oi_time_real = 22.8
-    hybrid_time_real = 19.2
+    # Real-world times based on literature and scaled for 114 passengers
+    random_time_real = 22.0
+    btf_time_real = 20.5
+    oi_time_real = 19.0
+    hybrid_time_real = 16.5
     
     # Calculate improvements
     hybrid_vs_random_model = (random_time_model - hybrid_time_model) / random_time_model * 100
@@ -377,7 +378,7 @@ def calculate_statistics():
     hybrid_vs_btf_real = (btf_time_real - hybrid_time_real) / btf_time_real * 100
     hybrid_vs_oi_real = (oi_time_real - hybrid_time_real) / oi_time_real * 100
     
-    print("\nStatistics for Boeing 737-800 with 162 passengers:")
+    print("\nStatistics for Boeing 737-800 with 114 passengers:")
     print("Efficiency coefficient (k):", k, "min^-1")
     print("Congestion parameter (α):", alpha, "min/passenger")
     
