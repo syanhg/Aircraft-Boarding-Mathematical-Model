@@ -1,0 +1,380 @@
+\documentclass[landscape]{article}
+\usepackage[landscape,margin=0.7in]{geometry}
+\usepackage{pgfplots}
+\usepackage{tikz}
+\pgfplotsset{compat=1.18}
+
+\begin{document}
+\pagestyle{empty}
+
+\begin{figure}
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            title={\Large Outside-In Strategy - Window Seats (A \& F)},
+            xlabel={Seat Column},
+            ylabel={Row Number},
+            xticklabels={A,B,C,D,E,F},
+            ytick={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19},
+            xtick={0,1,2,3,4,5},
+            xmin=-0.5,
+            xmax=5.5,
+            ymin=0.5,
+            ymax=19.5,
+            y dir=reverse,
+            enlargelimits=false,
+            axis on top,
+            width=0.9\textwidth,
+            height=0.4\textheight,
+            colorbar,
+            colormap={boarding}{
+                color(0)=(white);
+                color(0.5)=(yellow);
+                color(1)=(purple)
+            },
+            colorbar style={
+                title={Status},
+                ytick={0,0.5,1},
+                yticklabels={Empty,Boarding,Seated},
+            },
+            point meta min=0,
+            point meta max=1
+        ]
+            
+        % Initialize with outside-in pattern (Window seats boarding)
+        \addplot[matrix plot, mesh/cols=6, point meta=explicit] table [meta=C] {
+            x y C
+            0 1 0.5
+            1 1 0
+            2 1 0
+            3 1 0
+            4 1 0
+            5 1 0.5
+            0 2 0.5
+            1 2 0
+            2 2 0
+            3 2 0
+            4 2 0
+            5 2 0.5
+            0 3 1
+            1 3 0
+            2 3 0
+            3 3 0
+            4 3 0
+            5 3 1
+            0 4 1
+            1 4 0
+            2 4 0
+            3 4 0
+            4 4 0
+            5 4 1
+            0 5 1
+            1 5 0
+            2 5 0
+            3 5 0
+            4 5 0
+            5 5 1
+            0 6 1
+            1 6 0
+            2 6 0
+            3 6 0
+            4 6 0
+            5 6 1
+            0 7 1
+            1 7 0
+            2 7 0
+            3 7 0
+            4 7 0
+            5 7 1
+            0 8 1
+            1 8 0
+            2 8 0
+            3 8 0
+            4 8 0
+            5 8 1
+            0 9 1
+            1 9 0
+            2 9 0
+            3 9 0
+            4 9 0
+            5 9 1
+            0 10 1
+            1 10 0
+            2 10 0
+            3 10 0
+            4 10 0
+            5 10 1
+            0 11 1
+            1 11 0
+            2 11 0
+            3 11 0
+            4 11 0
+            5 11 1
+            0 12 1
+            1 12 0
+            2 12 0
+            3 12 0
+            4 12 0
+            5 12 1
+            0 13 1
+            1 13 0
+            2 13 0
+            3 13 0
+            4 13 0
+            5 13 1
+            0 14 1
+            1 14 0
+            2 14 0
+            3 14 0
+            4 14 0
+            5 14 1
+            0 15 1
+            1 15 0
+            2 15 0
+            3 15 0
+            4 15 0
+            5 15 1
+            0 16 1
+            1 16 0
+            2 16 0
+            3 16 0
+            4 16 0
+            5 16 1
+            0 17 1
+            1 17 0
+            2 17 0
+            3 17 0
+            4 17 0
+            5 17 1
+            0 18 1
+            1 18 0
+            2 18 0
+            3 18 0
+            4 18 0
+            5 18 1
+            0 19 1
+            1 19 0
+            2 19 0
+            3 19 0
+            4 19 0
+            5 19 1
+        };
+        
+        % Draw aisle line
+        \draw[black, thick, dashed] (axis cs:2.5,0.5) -- (axis cs:2.5,19.5);
+        
+        % Highlight current seat groups
+        \fill[blue!20, opacity=0.3] (axis cs:-0.5,0.5) rectangle (axis cs:0.5,19.5);
+        \fill[blue!20, opacity=0.3] (axis cs:5,0.5) rectangle (axis cs:5.5,19.5);
+        
+        % Add seat type labels
+        \node[font=\bfseries] at (axis cs:0,-1) {Window (A)};
+        \node[font=\bfseries] at (axis cs:1,-1) {Middle (B)};
+        \node[font=\bfseries] at (axis cs:2,-1) {Aisle (C)};
+        \node[font=\bfseries] at (axis cs:3,-1) {Aisle (D)};
+        \node[font=\bfseries] at (axis cs:4,-1) {Middle (E)};
+        \node[font=\bfseries] at (axis cs:5,-1) {Window (F)};
+        
+        % Time indicator
+        \node[font=\Large] at (axis cs:2.5,20.5) {t = 2.5 minutes};
+        
+        % Description
+        \node[draw, align=left, anchor=south west] at (axis cs:-0.5,-2.5) {
+            \textbf{Outside-In Boarding Strategy:}\\
+            • Passengers board by seat position, from window to aisle\\
+            • Sequence: Window seats (A \& F) → Middle seats (B \& E) → Aisle seats (C \& D)\\
+            • Currently boarding: Window seats (A \& F)\\
+            • Minimizes seat interference and passenger standing in aisles\\
+            • Most efficient theoretical strategy\\
+            • Estimated total boarding time: 7.5 minutes
+        };
+        \end{axis}
+    \end{tikzpicture}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            title={\Large Outside-In Strategy - Middle Seats (B \& E)},
+            xlabel={Seat Column},
+            ylabel={Row Number},
+            xticklabels={A,B,C,D,E,F},
+            ytick={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19},
+            xtick={0,1,2,3,4,5},
+            xmin=-0.5,
+            xmax=5.5,
+            ymin=0.5,
+            ymax=19.5,
+            y dir=reverse,
+            enlargelimits=false,
+            axis on top,
+            width=0.9\textwidth,
+            height=0.4\textheight,
+            colorbar,
+            colormap={boarding}{
+                color(0)=(white);
+                color(0.5)=(yellow);
+                color(1)=(purple)
+            },
+            colorbar style={
+                title={Status},
+                ytick={0,0.5,1},
+                yticklabels={Empty,Boarding,Seated},
+            },
+            point meta min=0,
+            point meta max=1
+        ]
+            
+        % Initialize with outside-in pattern (Middle seats boarding)
+        \addplot[matrix plot, mesh/cols=6, point meta=explicit] table [meta=C] {
+            x y C
+            0 1 1
+            1 1 0.5
+            2 1 0
+            3 1 0
+            4 1 0.5
+            5 1 1
+            0 2 1
+            1 2 0.5
+            2 2 0
+            3 2 0
+            4 2 0.5
+            5 2 1
+            0 3 1
+            1 3 1
+            2 3 0
+            3 3 0
+            4 3 1
+            5 3 1
+            0 4 1
+            1 4 1
+            2 4 0
+            3 4 0
+            4 4 1
+            5 4 1
+            0 5 1
+            1 5 1
+            2 5 0
+            3 5 0
+            4 5 1
+            5 5 1
+            0 6 1
+            1 6 1
+            2 6 0
+            3 6 0
+            4 6 1
+            5 6 1
+            0 7 1
+            1 7 1
+            2 7 0
+            3 7 0
+            4 7 1
+            5 7 1
+            0 8 1
+            1 8 1
+            2 8 0
+            3 8 0
+            4 8 1
+            5 8 1
+            0 9 1
+            1 9 1
+            2 9 0
+            3 9 0
+            4 9 1
+            5 9 1
+            0 10 1
+            1 10 1
+            2 10 0
+            3 10 0
+            4 10 1
+            5 10 1
+            0 11 1
+            1 11 1
+            2 11 0
+            3 11 0
+            4 11 1
+            5 11 1
+            0 12 1
+            1 12 1
+            2 12 0
+            3 12 0
+            4 12 1
+            5 12 1
+            0 13 1
+            1 13 1
+            2 13 0
+            3 13 0
+            4 13 1
+            5 13 1
+            0 14 1
+            1 14 1
+            2 14 0
+            3 14 0
+            4 14 1
+            5 14 1
+            0 15 1
+            1 15 1
+            2 15 0
+            3 15 0
+            4 15 1
+            5 15 1
+            0 16 1
+            1 16 1
+            2 16 0
+            3 16 0
+            4 16 1
+            5 16 1
+            0 17 1
+            1 17 1
+            2 17 0
+            3 17 0
+            4 17 1
+            5 17 1
+            0 18 1
+            1 18 1
+            2 18 0
+            3 18 0
+            4 18 1
+            5 18 1
+            0 19 1
+            1 19 1
+            2 19 0
+            3 19 0
+            4 19 1
+            5 19 1
+        };
+        
+        % Draw aisle line
+        \draw[black, thick, dashed] (axis cs:2.5,0.5) -- (axis cs:2.5,19.5);
+        
+        % Highlight current seat groups
+        \fill[blue!20, opacity=0.3] (axis cs:0.5,0.5) rectangle (axis cs:1.5,19.5);
+        \fill[blue!20, opacity=0.3] (axis cs:4,0.5) rectangle (axis cs:5,19.5);
+        
+        % Add seat type labels
+        \node[font=\bfseries] at (axis cs:0,-1) {Window (A)};
+        \node[font=\bfseries] at (axis cs:1,-1) {Middle (B)};
+        \node[font=\bfseries] at (axis cs:2,-1) {Aisle (C)};
+        \node[font=\bfseries] at (axis cs:3,-1) {Aisle (D)};
+        \node[font=\bfseries] at (axis cs:4,-1) {Middle (E)};
+        \node[font=\bfseries] at (axis cs:5,-1) {Window (F)};
+        
+        % Time indicator
+        \node[font=\Large] at (axis cs:2.5,20.5) {t = 5 minutes};
+        
+        % Description
+        \node[draw, align=left, anchor=south west] at (axis cs:-0.5,-2.5) {
+            \textbf{Outside-In Boarding Strategy:}\\
+            • Passengers board by seat position, from window to aisle\\
+            • Sequence: Window seats (A \& F) → Middle seats (B \& E) → Aisle seats (C \& D)\\
+            • Currently boarding: Middle seats (B \& E)\\
+            • Window seats already seated\\
+            • No need for passengers to stand to let others in\\
+            • Estimated total boarding time: 7.5 minutes
+        };
+        \end{axis}
+    \end{tikzpicture}
+\end{figure}
+
+\end{document}
